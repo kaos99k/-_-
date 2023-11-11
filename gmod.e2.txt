@@ -1,0 +1,85 @@
+@name null
+@inputs 
+@outputs [ Boom ]:number 
+@persist [ Ent, T ]:entity [ Tick ]:number 
+@trigger 
+    #runOnTick( 1 ) 
+    interval(10)
+    
+    if( first() || dupefinished() ){ entity():setMass( 1 ) 
+        #entity():propNotSolid(1) entity():setAlpha(0) # cut
+        T=owner() Boom=0 Tick=0 Ent=entity():isWeldedTo() 
+        
+        entity():setTrails( 10, 10, 5, "trails/laser", vec(0,0,255), 255 )
+    } Tick += 1 
+    
+    if( ( owner():keyWalk() && owner():keyReload()) 
+        || !T:isValid() ){ T=owner() holoDeleteAll() } 
+    
+    if( owner():keyZoom() ){ Tt = owner():aimEntity()
+        if( Tt:isValid() && Tt != T ){ T = owner():aimEntity()
+            hint( T:toString(), 30 ) } }
+    
+    if( owner():keyPressed("b") ){ if( T != owner() ){ holoCreate( T:id() ) 
+        holoModel( T:id(), "icosphere" ) #H:setMaterial("debug/env_cubemap_model") 
+        holoDisableShading( T:id(), 1 ) holoColor( T:id(), vec(0,0,0) ) 
+        holoScale( T:id(), vec(-5.3,-5.3,-5.3) ) holoPos( T:id(), T:pos() )
+        holoAng( T:id(), ang(0,0,0) ) holoParent( T:id(), T:weapon() ) }
+    }
+            
+    Pos = ( T:pos() ) if( T == owner() ){ Rad=(Ent:radius()*2)+(owner():radius()*2) 
+        Pos = ( T:pos()+vec( cos(Tick)*(Rad/3), sin(Tick)*(Rad/3), Rad ) ) 
+        }#Ent:propNotSolid(1) }else{ Ent:propNotSolid(0) } #cut
+    Vec=Pos-entity():pos() entity():applyForce( (Vec*Ent:mass())*entity():pos():distance(Pos) )
+     
+    if( Ent:pos():distance( T:pos() ) < 100 && T != owner() ){ Boom=1 } 
+    if( Tick%2 == 0 ){ Boom=0 R=array() foreach( _:number, E:entity = players() ){ R:pushEntity( E ) }
+        findByClass("*npc*") foreach( _:number, E:entity = findToArray() ){ R:pushEntity( E ) }  
+        for( I=0, R:count() ){ E = R[ I,entity ] if( E==owner() ){ continue }
+        
+            A = (owner():pos()-E:pos()):toAngle()
+            B = bearing( owner():pos(), ang( 0,0,0 ), E:pos() )
+            C = owner():pos() + vec( cos( -B )*50, sin( -B )*50, 25 )
+            holoCreate( I ) holoModel( I, "cone" ) holoScale( I, vec( 0.1, 0.1, 0.5 ) )
+            holoColor( I, vec( 255-((255/100)*E:health()), ((255/100)*E:health()), 0 ) )
+            holoDisableShading( I, 1 )
+            if( I==0 ){ holoColor( I, vec(255,255,255) ) A=ang(90,0,-90)
+                C = owner():pos()+vec( cos(90)*50, sin(90)*50, 25 ) }
+            if( E==T ){ holoColor( I, vec(255,0,255) ) }       
+            holoAng( I, A+ang(-90,0,0) ) holoPos( I, C+vec(0,0,0) ) holoShadow( I, 0 )
+        
+            if( T != owner() ){ E:applyForce( ( T:pos()-E:pos() )*E:mass()*10 ) }
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
