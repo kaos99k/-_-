@@ -30,11 +30,20 @@ int tick=0;
 #include "d3dx9.h" // #pragma comment(lib, "d3dx9.lib")
 #include "dwmapi.h" // #pragma comment(lib, "dwmapi.lib")
 #include "d3d9types.h"
+
+//	#define IDB_SPRITESHEET 101 //recource.h
+//	IDB_SPRITESHEET RCDATA DISCARDABLE "bob.png" //resource.rc
+#include "time.h"
+
 /* */ //  //-----------------------------------------------------------------------------
 class D3D{
 private:
-	IDirect3D9Ex *d3d; IDirect3DDevice9Ex *d3ddev;
-	LPD3DXSPRITE sprite; ID3DXFont *dfont; ID3DXLine *dline;
+	IDirect3D9Ex *d3d; IDirect3DDevice9Ex *d3ddev; 
+	ID3DXFont *dfont; ID3DXLine *dline;
+
+	LPD3DXSPRITE sprite; LPDIRECT3DTEXTURE9 texture; 
+	int sW=39,sH=30,sF=2,sA=0,cF=0,cA=0; 
+	float sS=1.0f; RECT sR; clock_t sT;
 public: 
 /* */ //  //-----------------------------------------------------------------------------
 	int init( HWND hwnd ){
@@ -57,7 +66,43 @@ public:
 		D3DXCreateLine( d3ddev, &dline ); dline->Begin();
 		D3DXCreateSprite( d3ddev, &sprite ); int s=16; 
 		D3DXCreateFont( d3ddev,s,s*0.5,0,0,0,0,0,0,0,(LPCSTR)"Calibri",&dfont ); 
-		return 0; }
+		
+		sprite_init("C:/Users/kaos9/Desktop/ash/cpp.png",39,30,4,4,1.0f);
+		return 0;
+	}
+
+//-----------------------------------------------------------------------------
+	int sprite_init( LPCSTR path, int sWidth, int sHeight, int sFrames, int sActions, float sScale ){ 
+		sW=sWidth;sH=sHeight;sS=sScale;sF=sFrames;sA=sActions;
+		cF=0;cA=1;
+		HRESULT hr=D3DXCreateTextureFromFile( d3ddev, path, &texture );
+		//D3DXCreateTextureFromResource(d3ddev,0,MAKEINTRESOURCE(IDB_SPRITESHEET),&texture);
+		D3DXMATRIX dM; D3DXMatrixIdentity(&dM); D3DXVECTOR2 vS(sS,sS);
+		D3DXMatrixTransformation2D(&dM,0,0,&vS,0,0,0); sprite->SetTransform(&dM);
+
+		//	sFrames : total number of frames per action
+		//	sActions : total number of actions per sheet
+		//
+		//	cF & cA : current Frame & Action
+		//
+		//
+		return 0; } 
+
+//-----------------------------------------------------------------------------
+	int sprite_draw(){
+
+		clock_t nT=clock(); //time(&nT);
+		
+		if(nT!=sT){if(cF<sF)cF++;else cF=0;sT=nT;}
+
+		sR.left=(cF*sW); 	sR.right=(cF*sW)+sW;
+		sR.top=(cA*sH); 	sR.bottom=sR.top+sH;
+
+		sprite->Begin(D3DXSPRITE_ALPHABLEND);
+		sprite->Draw( texture, &sR, 0,0, 0xFAFFFFFF );
+		sprite->End();
+		return 0; } 
+
 
 /* */ //  //-----------------------------------------------------------------------------
 	int drop(){ 
@@ -167,7 +212,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
 			d3d.line( 10, 10, 10+cos(tick/M_PI)*tick/M_PI, 10+sin(tick/M_PI)*tick/M_PI, 0xFF00FF00 );
 			d3d.line( 10, 10, 10+cos(tick)*20, 10+sin(tick)*20, 0xFF00FF00 );
-			
+
+			d3d.sprite_draw();
 		d3d.end();
 		break;
 
