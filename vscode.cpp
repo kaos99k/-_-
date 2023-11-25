@@ -67,23 +67,16 @@ public:
 		D3DXCreateSprite( d3ddev, &sprite ); int s=16; 
 		D3DXCreateFont( d3ddev,s,s*0.5,0,0,0,0,0,0,0,(LPCSTR)"Calibri",&dfont ); 
 		
-D3DXCreateSprite( d3ddev, &sprite ); 
-
-	//	HRESULT hr=D3DXCreateTextureFromFile( d3ddev, (LPCSTR)"cpp.png", &texture );
-		//D3DXCreateTextureFromResource(d3ddev,0,MAKEINTRESOURCE(IDB_SPRITESHEET),&texture);
-	//	sW=39;sH=30;sF=0;sA=0;sS=1.0f;sP.x=150*sS;sP.y=150*sS;
-	//	D3DXMATRIX dM; D3DXMatrixIdentity(&dM); D3DXVECTOR2 vS(1.0f,1.0f);
-	//	D3DXMatrixTransformation2D(&dM,0,0,&vS,0,0,0); sprite->SetTransform(&dM);
-		
+		D3DXCreateSprite( d3ddev, &sprite ); 
 		sprite_init("//FULL_PATH//cpp.png",128,128,7,14,1.0f);
 		// https://www.spriters-resource.com/fullview/143386/   // the sprite sheet used
+		
 		return 0;
 	}
 
 //-----------------------------------------------------------------------------
 	int sprite_init( LPCSTR path, int sWidth, int sHeight, int sFrames, int sActions, float sScale ){ 
-		sW=sWidth;sH=sHeight;sS=sScale;sF=sFrames;sA=sActions;
-		cF=0;cA=sActions; sT=clock();
+		sW=sWidth;sH=sHeight;sS=sScale;sF=sFrames;sA=sActions; cF=0;cA=sActions; sT=clock();
 		HRESULT hr=D3DXCreateTextureFromFile( d3ddev, path, &texture );
 		//D3DXCreateTextureFromResource(d3ddev,0,MAKEINTRESOURCE(IDB_SPRITESHEET),&texture);
 		D3DXMATRIX dM; D3DXMatrixIdentity(&dM); D3DXVECTOR2 vS(sS,sS);
@@ -110,10 +103,7 @@ D3DXCreateSprite( d3ddev, &sprite );
 		sprite->Draw( texture, &sR, 0,0, 0xFAFFFFFF );
 		sprite->End();
 
-		
 		return 0; } 
-
-
 
 /* */ //  //-----------------------------------------------------------------------------
 	int drop(){ 
