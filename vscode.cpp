@@ -67,14 +67,23 @@ public:
 		D3DXCreateSprite( d3ddev, &sprite ); int s=16; 
 		D3DXCreateFont( d3ddev,s,s*0.5,0,0,0,0,0,0,0,(LPCSTR)"Calibri",&dfont ); 
 		
-		sprite_init("C:/Users/kaos9/Desktop/ash/cpp.png",39,30,4,4,1.0f);
+D3DXCreateSprite( d3ddev, &sprite ); 
+
+	//	HRESULT hr=D3DXCreateTextureFromFile( d3ddev, (LPCSTR)"cpp.png", &texture );
+		//D3DXCreateTextureFromResource(d3ddev,0,MAKEINTRESOURCE(IDB_SPRITESHEET),&texture);
+	//	sW=39;sH=30;sF=0;sA=0;sS=1.0f;sP.x=150*sS;sP.y=150*sS;
+	//	D3DXMATRIX dM; D3DXMatrixIdentity(&dM); D3DXVECTOR2 vS(1.0f,1.0f);
+	//	D3DXMatrixTransformation2D(&dM,0,0,&vS,0,0,0); sprite->SetTransform(&dM);
+		
+		sprite_init("//FULL_PATH//cpp bub.png",128,128,7,14,1.0f);
+		
 		return 0;
 	}
 
 //-----------------------------------------------------------------------------
 	int sprite_init( LPCSTR path, int sWidth, int sHeight, int sFrames, int sActions, float sScale ){ 
 		sW=sWidth;sH=sHeight;sS=sScale;sF=sFrames;sA=sActions;
-		cF=0;cA=1;
+		cF=0;cA=sActions; sT=clock();
 		HRESULT hr=D3DXCreateTextureFromFile( d3ddev, path, &texture );
 		//D3DXCreateTextureFromResource(d3ddev,0,MAKEINTRESOURCE(IDB_SPRITESHEET),&texture);
 		D3DXMATRIX dM; D3DXMatrixIdentity(&dM); D3DXVECTOR2 vS(sS,sS);
@@ -91,9 +100,8 @@ public:
 //-----------------------------------------------------------------------------
 	int sprite_draw(){
 
-		clock_t nT=clock(); //time(&nT);
-		
-		if(nT!=sT){if(cF<sF)cF++;else cF=0;sT=nT;}
+		clock_t nT=clock(); //print(150,100,0xFFFFFFFF, "%i", (nT-sT) );
+		if( nT-sT > 200 ){if(cF<sF)cF++;else cF=0;sT=nT; }
 
 		sR.left=(cF*sW); 	sR.right=(cF*sW)+sW;
 		sR.top=(cA*sH); 	sR.bottom=sR.top+sH;
@@ -101,7 +109,10 @@ public:
 		sprite->Begin(D3DXSPRITE_ALPHABLEND);
 		sprite->Draw( texture, &sR, 0,0, 0xFAFFFFFF );
 		sprite->End();
+
+		
 		return 0; } 
+
 
 
 /* */ //  //-----------------------------------------------------------------------------
@@ -214,6 +225,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 			d3d.line( 10, 10, 10+cos(tick)*20, 10+sin(tick)*20, 0xFF00FF00 );
 
 			d3d.sprite_draw();
+		
 		d3d.end();
 		break;
 
