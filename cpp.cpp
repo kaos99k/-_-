@@ -15,10 +15,8 @@ TODO:
 #define WIN32_LEAN_AND_MEAN
 const int REDRAW=1, MW=2;
 
-#include "windows.h"
-//#include "winuser.h"
-#include "stdio.h"
-//#include "math.h"
+#include "windows.h" 	//#include "winuser.h"
+#include "stdio.h" 		//#include "math.h"
 
 /* * / //=================================================================================
      #include "d3d.h" // kaos99k.
@@ -31,7 +29,7 @@ const int REDRAW=1, MW=2;
 
 //	#define IDB_SPRITESHEET 101 //recource.h
 //	IDB_SPRITESHEET RCDATA DISCARDABLE "bob.png" //resource.rc
-//D3DXCreateTextureFromResource(d3ddev,0,MAKEINTRESOURCE(IDB_SPRITESHEET),&texture);
+// 	D3DXCreateTextureFromResource(d3ddev,0,MAKEINTRESOURCE(IDB_SPRITESHEET),&texture);
 
 //-----------------------------------------------------------------------------
 class D3D{
@@ -61,7 +59,7 @@ public:
 		d3d->CreateDeviceEx( 0, D3DDEVTYPE_HAL, hwnd, 
 			D3DCREATE_MIXED_VERTEXPROCESSING, &pp, 0, &d3ddev );
 
-		int s=16; D3DXCreateFont( d3ddev,s,s*0.5,0,0,0,0,0,0,0,(LPCSTR)"Calibri",&dfont ); 
+		int s=16;D3DXCreateFont(d3ddev,s,s*0.5,0,0,0,0,0,0,0,(LPCSTR)"Calibri",&dfont); 
 		
 		D3DXCreateLine( d3ddev, &dline ); dline->Begin();
 		D3DXCreateSprite( d3ddev, &sprite ); 
@@ -183,7 +181,6 @@ public:
 
 
 /* * / //=================================================================================
-		vscode.cpp // kaos99k.
 /* */ //---------------------------------------------------------------------------------
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 	switch (msg){
@@ -245,7 +242,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
 /* */ // main //=========================================================================
 /* */ //---------------------------------------------------------------------------------
-int main(){ system("TITLE vscode && mingw64 :: kaos99k. "); 
+int main(){ system("TITLE vsCode + mingW64 :: kaos99k. "); 
 
 	SYSTEM_POWER_STATUS sPs; GetSystemPowerStatus(&sPs);
 	printf("Batt: %i%, Flag: %x \n", sPs.BatteryLifePercent, sPs.BatteryFlag );
@@ -253,7 +250,7 @@ int main(){ system("TITLE vscode && mingw64 :: kaos99k. ");
 	printf("Arc: %i %i %i \n", sizeof(void *), sizeof(DWORD), sizeof(DWORD_PTR) );
 
 /* */ // Farproc an external proc? // ---------------------------------------------------
-	DWORD pid = mem.getExeProcessId("vscode.exe"); printf("pId: 0x%x \n", pid );
+	DWORD pid = mem.getExeProcessId("cpp.exe"); printf("pId: 0x%x \n", pid );
 	printf("winGDI base: 0x%x \n", mem.getModuleBase( pid, "GDI32.dll").modBaseAddr );
 	
 	FARPROC createPenOff=GetProcAddress(mem.getModuleBase(pid,"GDI32.dll").hModule,"CreatePen");
