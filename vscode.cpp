@@ -75,8 +75,8 @@ D3DXCreateSprite( d3ddev, &sprite );
 	//	D3DXMATRIX dM; D3DXMatrixIdentity(&dM); D3DXVECTOR2 vS(1.0f,1.0f);
 	//	D3DXMatrixTransformation2D(&dM,0,0,&vS,0,0,0); sprite->SetTransform(&dM);
 		
-		sprite_init("//FULL_PATH//cpp bub.png",128,128,7,14,1.0f);
-		
+		sprite_init("//FULL_PATH//cpp.png",128,128,7,14,1.0f);
+		// https://www.spriters-resource.com/fullview/143386/   // the sprite sheet used
 		return 0;
 	}
 
