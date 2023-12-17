@@ -17,8 +17,9 @@ TODO:
 #define WIN32_LEAN_AND_MEAN
 const int REDRAW=1, MW=2; char DIR[1024];
 
-#include "windows.h" 	//#include "winuser.h"
-#include "stdio.h" 		//#include "math.h"
+#include "windows.h" 
+#include "stdio.h" 		
+
 
 
 
@@ -62,8 +63,9 @@ public:
 			//printf("%s 0x%x (0x%x)\n",tmp,mB.modBaseAddr,mB.modBaseSize );
 			if(strcmp(tmp,tag)==0){mB=mE;break;}}CloseHandle(h);return mB;} 
 
-}; MemoryUtils mem;
-/* */ //---------------------------------------------------------------------------------
+}; MemoryUtils mem; /* */ //---------------------------------------------------------------------------------
+
+
 
 
 
@@ -121,14 +123,12 @@ public:
 		vsprintf( buf, text, list ); va_end( list ); SetRect( &ta, x, y, 0, 0 );
 		d3dfont->DrawTextA( 0, buf, -1, &ta, DT_LEFT|DT_NOCLIP, color ); } 
 	//-----------------------------------------------------------------------------
-}; D3D d3d;
-/* */ //-----------------------------------------------------------------------------
+}; D3D d3d; /* */ //---------------------------------------------------------------------
 
 /* * / //=================================================================================
      #include "d3dsprite.h" // extends d3d.h, kaos99k.
 /* */ //---------------------------------------------------------------------------------
 #include "time.h"
-
 class D3Dsprite{
 private:
 	LPD3DXSPRITE sprite; LPDIRECT3DTEXTURE9 texture; D3DXMATRIX dM; D3DXVECTOR2 vC, vS;
@@ -146,7 +146,7 @@ public:
 	//-----------------------------------------------------------------------------
 	int draw(){ 
 		clock_t nT=clock();
-		if( (nT-sT) > sD ){ sT=nT; switch( sA ){
+		if( (nT-sT) > sD*sS ){ sT=nT; switch( sA ){
 
 			default: if( cF < (sF*sF) ) cF++; else cF=0; break;
 
@@ -162,7 +162,7 @@ public:
 					else sA=1;
 				break;
 
-		} } 	
+		} } 	sP.y=(sH*(1-sS));
 
 		sR.left=((cF%sF)*sW);sR.right=sR.left+sW;
 		sR.top=((cF/sF)*sH);sR.bottom=sR.top+sH;
@@ -177,12 +177,14 @@ public:
 
 		return 0; } 
 	//-----------------------------------------------------------------------------
-}; D3Dsprite sprite;
-/* */ //---------------------------------------------------------------------------------
+}; D3Dsprite sprite; /* */ //---------------------------------------------------------------------------------
+
+
 
 
 
 /* * / //=================================================================================
+	WndProc //
 /* */ //---------------------------------------------------------------------------------
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 	switch (msg){
@@ -191,16 +193,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		d3d.init(hwnd); 
 
 		char img[1024]; strcpy(img,DIR); strcat(img,"cpp.png");
-		sprite.init(img,128,128,16,1.0f); //sprite.init(img,128,128,16,0.5f); 
+		sprite.init(img,128,128,16,1.0f); sprite.init(img,128,128,16,0.75f); 
 		//	https://www.spriters-resource.com/fullview/143386/  // the sprite sheet
-		
+
 		SetTimer(hwnd,REDRAW,1024/10,0); 
 		::FreeConsole();
 		break; 
 
 	//-----------------------------------------------------------------------------
 	case WM_DESTROY: 
-		d3d.drop(); sprite.drop();
+		d3d.drop(); sprite.drop(); 
+		
 		KillTimer(hwnd, REDRAW); KillTimer(hwnd, MW); 
 		UnregisterClass((LPSTR)" ",0);
 		PostQuitMessage(0);
@@ -250,8 +253,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
 
 
-/* */ // main //=========================================================================
-/* */ //---------------------------------------------------------------------------------
+
+
+/* * / // main //=========================================================================
+	code is poetry :: kaos99k.
+/* */ //   // ---------------------------------------------------------------------------
 int main(int argc, char* argv[]){ //system("TITLE vsCode + mingW64 :: kaos99k. "); 
 
 	SYSTEM_POWER_STATUS sPs; GetSystemPowerStatus(&sPs);
@@ -261,27 +267,17 @@ int main(int argc, char* argv[]){ //system("TITLE vsCode + mingW64 :: kaos99k. "
 	strncpy(DIR,argv[0],(strlen(argv[0])-strlen(strrchr(argv[0],'\\'))+1));printf("%s \n",DIR);
 	
 
-/* * / // Farproc an external proc? // ---------------------------------------------------
-	DWORD pid = mem.getExeProcessId("cpp.exe"); printf("pId: 0x%x \n", pid );
-	printf("winGDI base: 0x%x \n", mem.getModuleBase( pid, "GDI32.dll").modBaseAddr );
-	
-	FARPROC createPenOff=GetProcAddress(mem.getModuleBase(pid,"GDI32.dll").hModule,"CreatePen");
-	printf("createPen: 0x%x \n", createPenOff ); /* */
+/* */ // FARPROC an external proc?  //---------------------------------------------------
+	typedef bool(WINAPI *setCurPosExternal)(int x, int y );
 
+	DWORD pId=mem.getExeProcessId("cpp.exe"); printf("pId: 0x%x \n", pId );
+	printf("USER32.dll: 0x%x \n", mem.getModuleBase( pId, "USER32.dll").modBaseAddr );
 
-/* * / // WinGDI // ---------------------------------------------------------------------
-//	#include "wingdi.h" //#pragma comment(lib, "GDI32")
+	FARPROC setCurPosAddr=GetProcAddress(mem.getModuleBase(pId,"USER32.dll").hModule,"SetCursorPos");
+	printf("SetCursorPos: 0x%x \n", setCurPosAddr );
 
-	POINT p; DWORD col=RGB(80,80,80); HPEN pen; int tick=0;
-	HDC hdc=GetDC( FindWindow( (LPCSTR)"SysListView32" ,0 ) ); 
-	printf(" 	* hold ALT to winGDI, press F5 to d3d. \n"); 
-	while(!GetAsyncKeyState(VK_F5)&1){
-		if( GetAsyncKeyState( 0x12 ) ){ //ALT
-			GetCursorPos(&p); pen=CreatePen( 0, 1, col ); tick++;
-			SelectObject( hdc, pen ); GetPixel( hdc, p.x, p.y );
-			col = RGB( 100+rand()%155, 100+rand()%155, 100+rand()%155 ); 
-			SetPixel(hdc,p.x+cos(tick/M_PI)*tick/M_PI,p.y+sin(tick/M_PI)*tick/M_PI,col);
-		}else{ DeleteObject( pen ); tick=0; } Sleep(1); }printf("end."); /* */
+	setCurPosExternal setCurPosExt=(setCurPosExternal)GetProcAddress(mem.getModuleBase(pId,"USER32.dll").hModule,"SetCursorPos"); 
+	setCurPosExt( 100, 100 ); /* */
 
 
 /* */ // Initiate Window //------------------------------------------------------------------
