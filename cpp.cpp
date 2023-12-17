@@ -268,18 +268,31 @@ int main(int argc, char* argv[]){ //system("TITLE vsCode + mingW64 :: kaos99k. "
 	
 
 /* */ // FARPROC an external proc?  //---------------------------------------------------
-	typedef bool(WINAPI *setCurPosExternal)(int x, int y );
-
+	
 	DWORD pId=mem.getExeProcessId("cpp.exe"); printf("pId: 0x%x \n", pId );
 	printf("USER32.dll: 0x%x \n", mem.getModuleBase( pId, "USER32.dll").modBaseAddr );
-
 	FARPROC setCurPosAddr=GetProcAddress(mem.getModuleBase(pId,"USER32.dll").hModule,"SetCursorPos");
 	printf("SetCursorPos: 0x%x \n", setCurPosAddr );
-
+	typedef bool(WINAPI *setCurPosExternal)(int x, int y );
 	setCurPosExternal setCurPosExt=(setCurPosExternal)GetProcAddress(mem.getModuleBase(pId,"USER32.dll").hModule,"SetCursorPos"); 
 	setCurPosExt( 100, 100 ); /* */
 
+	
+/* * /{ // WinGDI // ---------------------------------------------------------------------
+//	#include "wingdi.h" //#pragma comment(lib, "GDI32")
 
+	POINT p; DWORD col=RGB(80,80,80); HPEN pen; int tick=0;
+	HDC hdc=GetDC( FindWindow( (LPCSTR)"SysListView32" ,0 ) ); 
+	printf(" 	* hold ALT to winGDI, press F5 to d3d. \n"); 
+	while(!GetAsyncKeyState(VK_F5)&1){
+		if( GetAsyncKeyState( 0x12 ) ){ //ALT
+			GetCursorPos(&p); pen=CreatePen( 0, 1, col ); tick++;
+			SelectObject( hdc, pen ); GetPixel( hdc, p.x, p.y );
+			col = RGB( 100+rand()%155, 100+rand()%155, 100+rand()%155 ); 
+			SetPixel(hdc,p.x+cos(tick/M_PI)*tick/M_PI,p.y+sin(tick/M_PI)*tick/M_PI,col);
+		}else{ DeleteObject( pen ); tick=0; } Sleep(1); }printf("end."); }/* */
+
+	
 /* */ // Initiate Window //------------------------------------------------------------------
 	WNDCLASSEX wc={sizeof(WNDCLASSEX),0,WndProc,0,0,0,0,0,0,0,(LPSTR)" ",0};
 	if (!RegisterClassEx(&wc)){ printf("ERR RegClass\n"); Sleep(2000); exit(0); }
