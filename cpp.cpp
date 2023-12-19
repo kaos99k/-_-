@@ -1,6 +1,7 @@
 /* * / //=================================================================================
-	vscode & mingW64 :: kaos99k.
+	灰 :: vscode & mingW64 :: kaos99k.
 /* * / //---------------------------------------------------------------------------------
+
 	* d3d.h 		- a D3D class thats class.
 	* d3dSprite.h 	- sprite sheet animation, extends d3d.h
 	* mem.h 		- memory utils, tweaks and shiz.
@@ -9,18 +10,17 @@
 	*				- other bits of scratch.
 
 TODO:
-	* scratch my head some more?..
 
+	* scratch my head some more?..
 
 /* */ //---------------------------------------------------------------------------------
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
-const int REDRAW=1, MW=2; char DIR[1024];
 
 #include "windows.h" 
 #include "stdio.h" 		
 
-
+const int REDRAW=1, MW=2; char DIR[1024]; LPCSTR str="灰";
 
 
 /* * / //=================================================================================
@@ -76,11 +76,9 @@ public:
 #include "d3dx9.h" // #pragma comment(lib, "d3dx9.lib")
 #include "dwmapi.h" // #pragma comment(lib, "dwmapi.lib")
 #include "d3d9types.h"
-
 //	#define IDB_SPRITESHEET 101 //recource.h
 //	IDB_SPRITESHEET RCDATA DISCARDABLE "cpp.png" //resource.rc
 // 	D3DXCreateTextureFromResource(d3ddev,0,MAKEINTRESOURCE(IDB_SPRITESHEET),&texture); //.cpp
-
 //-----------------------------------------------------------------------------
 class D3D{
 private:
@@ -124,7 +122,6 @@ public:
 		d3dfont->DrawTextA( 0, buf, -1, &ta, DT_LEFT|DT_NOCLIP, color ); } 
 	//-----------------------------------------------------------------------------
 }; D3D d3d; /* */ //---------------------------------------------------------------------
-
 /* * / //=================================================================================
      #include "d3dsprite.h" // extends d3d.h, kaos99k.
 /* */ //---------------------------------------------------------------------------------
@@ -205,7 +202,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		d3d.drop(); sprite.drop(); 
 		
 		KillTimer(hwnd, REDRAW); KillTimer(hwnd, MW); 
-		UnregisterClass((LPSTR)" ",0);
+		UnregisterClass(str,0);
 		PostQuitMessage(0);
 		break; 
 
@@ -256,47 +253,31 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
 
 /* * / // main //=========================================================================
-	code is poetry :: kaos99k.
+	灰 :: code is poetry // kaos99k.
 /* */ //   // ---------------------------------------------------------------------------
 int main(int argc, char* argv[]){ //system("TITLE vsCode + mingW64 :: kaos99k. "); 
 
 	SYSTEM_POWER_STATUS sPs; GetSystemPowerStatus(&sPs);
-	printf("Batt: %i%, Flag: %i \n", sPs.BatteryLifePercent, sPs.BatteryFlag );
+	printf("Bat: %i%, %i \n", sPs.BatteryLifePercent, sPs.BatteryFlag );
 	printf("Res: %i x %i \n", GetSystemMetrics(0), GetSystemMetrics(1) );
 	printf("Arc: %i %i %i \n", sizeof(void *), sizeof(DWORD), sizeof(DWORD_PTR) );
-	strncpy(DIR,argv[0],(strlen(argv[0])-strlen(strrchr(argv[0],'\\'))+1));printf("%s \n",DIR);
+	strncpy(DIR,argv[0],(strlen(argv[0])-strlen(strrchr(argv[0],'\\'))+1));printf("Dir: %s \n",DIR);
 	
 
 /* */ // FARPROC an external proc?  //---------------------------------------------------
-	
 	DWORD pId=mem.getExeProcessId("cpp.exe"); printf("pId: 0x%x \n", pId );
 	printf("USER32.dll: 0x%x \n", mem.getModuleBase( pId, "USER32.dll").modBaseAddr );
 	FARPROC setCurPosAddr=GetProcAddress(mem.getModuleBase(pId,"USER32.dll").hModule,"SetCursorPos");
 	printf("SetCursorPos: 0x%x \n", setCurPosAddr );
-	typedef bool(WINAPI *setCurPosExternal)(int x, int y );
+	typedef bool(WINAPI *setCurPosExternal)( int x, int y );
 	setCurPosExternal setCurPosExt=(setCurPosExternal)GetProcAddress(mem.getModuleBase(pId,"USER32.dll").hModule,"SetCursorPos"); 
-	setCurPosExt( 100, 100 ); /* */
+	setCurPosExt(GetSystemMetrics(0)/2,GetSystemMetrics(1)/2); /* */
 
-	
-/* * /{ // WinGDI // ---------------------------------------------------------------------
-//	#include "wingdi.h" //#pragma comment(lib, "GDI32")
 
-	POINT p; DWORD col=RGB(80,80,80); HPEN pen; int tick=0;
-	HDC hdc=GetDC( FindWindow( (LPCSTR)"SysListView32" ,0 ) ); 
-	printf(" 	* hold ALT to winGDI, press F5 to d3d. \n"); 
-	while(!GetAsyncKeyState(VK_F5)&1){
-		if( GetAsyncKeyState( 0x12 ) ){ //ALT
-			GetCursorPos(&p); pen=CreatePen( 0, 1, col ); tick++;
-			SelectObject( hdc, pen ); GetPixel( hdc, p.x, p.y );
-			col = RGB( 100+rand()%155, 100+rand()%155, 100+rand()%155 ); 
-			SetPixel(hdc,p.x+cos(tick/M_PI)*tick/M_PI,p.y+sin(tick/M_PI)*tick/M_PI,col);
-		}else{ DeleteObject( pen ); tick=0; } Sleep(1); }printf("end."); }/* */
-
-	
 /* */ // Initiate Window //------------------------------------------------------------------
-	WNDCLASSEX wc={sizeof(WNDCLASSEX),0,WndProc,0,0,0,0,0,0,0,(LPSTR)" ",0};
+	WNDCLASSEX wc={sizeof(WNDCLASSEX),0,WndProc,0,0,0,0,0,0,0,str,0};
 	if (!RegisterClassEx(&wc)){ printf("ERR RegClass\n"); Sleep(2000); exit(0); }
-	HWND hWnd = CreateWindowEx( 0x0A080028l, wc.lpszClassName,(LPSTR)" ", WS_POPUP,//WINDOW,
+	HWND hWnd = CreateWindowEx( 0x0A080028l, wc.lpszClassName,str, WS_POPUP,//WINDOW,
 		0, GetSystemMetrics(1)-168,GetSystemMetrics(0),168,0,0,wc.hInstance,0);
 	if(!hWnd){ printf("ERR hWnd\n"); Sleep(2000); return 0; } ShowWindow(hWnd, SW_SHOW);
 	MSG msg; while(GetMessage(&msg, NULL, 0, 0) > 0){
